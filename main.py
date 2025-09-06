@@ -1,3 +1,11 @@
+import subprocess
+try:
+    result = subprocess.run(["pdfinfo", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    print("✅ pdfinfo output:\n", result.stdout or result.stderr)
+except FileNotFoundError:
+    print("❌ pdfinfo not found in system PATH.")
+
+
 import streamlit as st
 from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
@@ -90,3 +98,4 @@ if uploaded_file and st.button("Generate Micro Xerox PDF"):
     st.success("✅ PDF generated successfully!")
     with open(output_path, "rb") as f:
         st.download_button("📥 Download File", f, file_name="microxerox.pdf")
+

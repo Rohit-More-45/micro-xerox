@@ -1,11 +1,4 @@
 import subprocess
-try:
-    result = subprocess.run(["pdfinfo", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    print("✅ pdfinfo output:\n", result.stdout or result.stderr)
-except FileNotFoundError:
-    print("❌ pdfinfo not found in system PATH.")
-
-
 import streamlit as st
 from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
@@ -14,6 +7,19 @@ from reportlab.lib.utils import ImageReader
 from PIL import Image
 from io import BytesIO
 import os
+import base64
+
+# --- Check if pdfinfo is available (Poppler) ---
+try:
+    result = subprocess.run(
+        ["pdfinfo", "-v"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    st.write("✅ pdfinfo found:", result.stdout or result.stderr)
+except FileNotFoundError:
+    st.error("❌ pdfinfo (Poppler) not found in system PATH. Please install Poppler.")
 
 # --- Utility functions ---
 def create_blank_page(size):
@@ -96,6 +102,20 @@ if uploaded_file and st.button("Generate Micro Xerox PDF"):
     generate_microxerox(input_path, output_path, pages_per_sheet)
 
     st.success("✅ PDF generated successfully!")
-    with open(output_path, "rb") as f:
-        st.download_button("📥 Download File", f, file_name="microxerox.pdf")
 
+    # Read into memory
+    with open(output_path, "rb") as f:
+        pdf_bytes = f.read()
+
+    # Option 1: Normal download button
+    st.download_button(
+        "📥 Download File",
+        data=pdf_bytes,
+        file_name="microxerox.pdf",
+        mime="application/pdf"
+    )
+
+    # Option 2: Auto-download link (optional)
+    b64 = base64.b64encode(pdf_bytes).decode()
+    href = f'<a href="data:application/pdf;base64,{b64}" download="microxerox.pdf">📥 Auto Download</a>'
+    st.markdown(href, unsafe_allow_html=True)

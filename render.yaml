@@ -2,6 +2,6 @@ services:
   - type: web
     name: micro-xerox
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: streamlit run main.py --server.port 10000 --server.address 0.0.0.0
     plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run main.py --server.port 10000 --server.address 0.0.0.0

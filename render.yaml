@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: micro-xerox
+    env: python
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y poppler-utils
+      pip install -r requirements.txt
+    startCommand: streamlit run main.py --server.port=10000 --server.enableCORS=false
